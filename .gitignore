@@ -3,7 +3,8 @@
 
 ### direnv ###
 .direnv
-.envrc
+.envrc\
+.env
 
 ### NextJS ###
 # Dependencies
