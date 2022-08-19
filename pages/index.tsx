@@ -8,7 +8,7 @@ const Home: NextPage = () => {
     return (
       <>
         <h1>Hola @{session.user.name} 🏢</h1>
-        {session.user.role === "ADMIN" && <Text size="xs">Soy admin</Text>}
+        {session.user.role === "ADMIN" && <h1>Soy admin</h1>}
         <Group>
           <Button onClick={() => signOut()}>Cerrar Sesión</Button>
         </Group>
