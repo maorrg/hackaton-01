@@ -16,7 +16,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   return (
     <>
       <Head>
-        <title>XPanda Empresa</title>
+        <title>FeedMe</title>
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1,, maximum-scale=1, user-scalable=no, shrink-to-fit=no, width=device-width"

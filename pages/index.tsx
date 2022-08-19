@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { Container, Button, Group, LoadingOverlay } from "@mantine/core";
+import { Container, Button, Group, LoadingOverlay, Text } from "@mantine/core";
 import { useSession, signIn, signOut } from "next-auth/react";
 
 const Home: NextPage = () => {
@@ -8,6 +8,7 @@ const Home: NextPage = () => {
     return (
       <>
         <h1>Hola @{session.user.name} 🏢</h1>
+        {session.user.role === "ADMIN" && <Text size="xs">Soy admin</Text>}
         <Group>
           <Button onClick={() => signOut()}>Cerrar Sesión</Button>
         </Group>
