@@ -38,19 +38,48 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?   @default("")
-  email         String    @unique
-  emailVerified DateTime?
-  password      String?
-  role          Role      @default(GUEST)
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  id                String                       @id @default(auto()) @map("_id") @db.ObjectId
+  name              String?                      @default("")
+  lastname          String?                      @default("")
+  email             String                       @unique
+  password          String?
+  role              Role                         @default(GUEST)
+  accounts          Account[]
+  sessions          Session[]
+  courseAndFeedback TeacherAndCourseOnFeedback[]
+  feedbackIDs       String[]                     @db.ObjectId
+  feedback          Feedback[]                   @relation(fields: [feedbackIDs], references: [id])
+}
+
+model Course {
+  id                 String                       @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  teacherAndFeedback TeacherAndCourseOnFeedback[]
+}
+
+model TeacherAndCourseOnFeedback {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  teacher    User     @relation(fields: [teacherId], references: [id])
+  teacherId  String   @db.ObjectId
+  course     Course   @relation(fields: [courseId], references: [id])
+  courseId   String   @db.ObjectId
+  feedback   Feedback @relation(fields: [feedbackId], references: [id])
+  feedbackId String   @db.ObjectId
+
+  @@unique([teacherId, courseId, feedbackId])
+}
+
+model Feedback {
+  id               String                       @id @default(auto()) @map("_id") @db.ObjectId
+  teacherAndCourse TeacherAndCourseOnFeedback[]
+  userIDs          String[]                     @db.ObjectId
+  students         User[]                       @relation(fields: [userIDs], references: [id])
+  createdAt        DateTime                     @default(now())
 }
 
 enum Role {
-  ADMIN
+  TEACHER
+  STUDENT
   GUEST
 }
 
