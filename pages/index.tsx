@@ -1,9 +1,11 @@
-import type { NextPage } from "next";
+import type { NextPage, NextPageContext } from "next";
 import { Container, Button, Group, LoadingOverlay, Text } from "@mantine/core";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut, getSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const { data: session, status } = useSession();
+  const router = useRouter();
   if (session) {
     return (
       <>
@@ -14,8 +16,26 @@ const Home: NextPage = () => {
         </Group>
       </>
     );
+  } else {
+    return <h1>Error con la sesión.</h1>;
   }
-  return <h1>No ha iniciado sesión</h1>;
 };
+
+export async function getServerSideProps(context: NextPageContext) {
+  const session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { session },
+  };
+}
 
 export default Home;
