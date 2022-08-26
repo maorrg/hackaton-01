@@ -1,7 +1,8 @@
 import type { NextPage, NextPageContext } from "next";
-import { Container, Button, Group, LoadingOverlay, Text } from "@mantine/core";
+import { Container, Button, Group, LoadingOverlay, Text, Title } from "@mantine/core";
 import { useSession, signIn, signOut, getSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import BackOfficeShell from "../components/Layout/AppShell/BackOfficeShell";
 
 const Home: NextPage = () => {
   const { data: session, status } = useSession();
@@ -9,8 +10,15 @@ const Home: NextPage = () => {
   if (session) {
     return (
       <>
-        <h1>Hola @{session.user.name} 🏢</h1>
-        {session.user.role === "ADMIN" && <h1>Soy admin</h1>}
+        {/* <h1>Hola @{session.user.name} 🏢</h1>
+        {session.user.role === "ADMIN" && <h1>Soy admin</h1>} */}
+        <BackOfficeShell>
+          <Title order={2}>
+            Hola, {session?.user?.name}
+            {"  👋"}
+            <br />
+          </Title>
+        </BackOfficeShell>
         <Group>
           <Button onClick={() => signOut()}>Cerrar Sesión</Button>
         </Group>

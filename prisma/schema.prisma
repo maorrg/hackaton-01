@@ -42,8 +42,10 @@ model User {
   name              String?                      @default("")
   lastname          String?                      @default("")
   email             String                       @unique
+  emailVerified     DateTime?
   password          String?
   role              Role                         @default(GUEST)
+  image             String?
   accounts          Account[]
   sessions          Session[]
   courseAndFeedback TeacherAndCourseOnFeedback[]

@@ -1,57 +1,20 @@
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "../../../utils/prisma";
-const bcrypt = require("bcryptjs");
+import { Role } from "../../../types/role";
 
 export default NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
-    CredentialsProvider({
-      name: "correo y contraseña",
-      credentials: {
-        email: { label: "Correo Electrónico", type: "text" },
-        password: { label: "Contraseña", type: "password" },
-      },
-      async authorize(credentials, req) {
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials?.email,
-          },
-          select: {
-            id: true,
-            email: true,
-            role: true,
-            password: true,
-            name: true,
-          },
-        });
-        if (!user) {
-          return null;
-        } else {
-          const isValid = await bcrypt.compareSync(
-            credentials?.password,
-            user?.password
-          );
-          if (!isValid) {
-            throw new Error("Credenciales incorrectas");
-          }
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          };
-        }
-      },
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role;
-        token.businessName = user.businessName;
-      }
+      if (user) token.role = user.role;
       return token;
     },
     async session({ session, token }) {
@@ -61,9 +24,6 @@ export default NextAuth({
   },
   session: {
     strategy: "jwt",
-  },
-  pages: {
-    signIn: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
