@@ -45,7 +45,7 @@ export default function BackOfficeShell({ children }: AuxProps) {
           p="md"
           hiddenBreakpoint="sm"
           hidden={!opened}
-          width={{ sm: 200, lg: 300 }}
+          width={{ sm: 300, lg: 320 }}
         >
           <Navbar.Section grow mt="xs">
             <MainLinks />
@@ -55,11 +55,6 @@ export default function BackOfficeShell({ children }: AuxProps) {
           </Navbar.Section>
         </Navbar>
       }
-      // footer={
-      //   <Footer height={60} p="md">
-      //     Application footer
-      //   </Footer>
-      // }
       header={
         <Header height={70} p="md">
           <div
@@ -89,8 +84,7 @@ export default function BackOfficeShell({ children }: AuxProps) {
 
               <Title order={3}>
                 <MdOutlineFeedback />
-                &nbsp;
-                FeedMe
+                &nbsp; FeedMe
               </Title>
             </div>
           </div>

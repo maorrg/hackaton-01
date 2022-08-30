@@ -33,12 +33,6 @@ const LoginForm = (props: any) => {
       >
         <GoogleButton radius="xl">Google</GoogleButton>
       </Group>
-
-      <Divider
-        label="o mediante su correo electrónico"
-        labelPosition="center"
-        my="lg"
-      />
     </Paper>
   );
 };

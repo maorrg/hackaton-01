@@ -1,65 +1,81 @@
-import React from "react";
+import { forwardRef } from "react";
 import {
-  UnstyledButton,
   Group,
   Avatar,
   Text,
+  Menu,
+  UnstyledButton,
   Box,
-  useMantineTheme,
+  Grid,
 } from "@mantine/core";
-import { HiOutlineChevronRight, HiOutlineChevronLeft } from "react-icons/hi";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
+import { FiChevronRight } from "react-icons/fi";
+import { FiLogOut } from "react-icons/fi";
+import Router from "next/router";
+
+interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
+  image?: string;
+  name?: string;
+  email?: string;
+  icon?: React.ReactNode;
+}
+
+const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
+  ({ image, name, email, icon, ...others }: UserButtonProps, ref) => (
+    <UnstyledButton
+      ref={ref}
+      sx={(theme) => ({
+        display: "block",
+        width: "100%",
+        padding: theme.spacing.md,
+        color:
+          theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
+
+        "&:hover": {
+          backgroundColor:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[8]
+              : theme.colors.gray[0],
+        },
+      })}
+      {...others}
+    >
+      <Group>
+        <Avatar src={image} radius="xl" />
+        <Box sx={{ flex: 1 }}>
+          <Text size="sm" weight={500}>
+            {name}
+          </Text>
+
+          <Text color="dimmed" size="xs">
+            {email}
+          </Text>
+        </Box>
+        <FiChevronRight size={18} />
+      </Group>
+    </UnstyledButton>
+  )
+);
 
 export function User() {
-  const theme = useMantineTheme();
   const { data: session, status } = useSession();
-  
   return (
-    <Box
-      sx={{
-        paddingTop: theme.spacing.sm,
-        borderTop: `1px solid ${
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[4]
-            : theme.colors.gray[2]
-        }`,
-      }}
-    >
-      <UnstyledButton
-        sx={{
-          display: "block",
-          width: "100%",
-          padding: theme.spacing.xs,
-          borderRadius: theme.radius.sm,
-          color:
-            theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
-
-          "&:hover": {
-            backgroundColor:
-              theme.colorScheme === "dark"
-                ? theme.colors.dark[6]
-                : theme.colors.gray[0],
-          },
-        }}
-      >
-        <Group>
-          <Avatar src={session?.user.image} radius="xl" />
-          <Box sx={{ flex: 1 }}>
-            <Text size="sm" weight={500}>
-              {session?.user.name}
-            </Text>
-            <Text color="dimmed" size="xs">
-              {session?.user.email}
-            </Text>
-          </Box>
-
-          {theme.dir === "ltr" ? (
-            <HiOutlineChevronRight size={18} />
-          ) : (
-            <HiOutlineChevronRight size={18} />
-          )}
-        </Group>
-      </UnstyledButton>
-    </Box>
+    <Group position="center">
+      <Menu withArrow position="right" shadow="md" width={200}>
+        <Menu.Target>
+          <UserButton
+            image={session?.user.image!}
+            name={session?.user.name!}
+            email={session?.user.email!}
+          />
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>Cuenta</Menu.Label>
+          <Menu.Item onClick={() => signOut()} icon={<FiLogOut size={14} />}>
+            Cerrar Sesión
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    </Group>
   );
 }

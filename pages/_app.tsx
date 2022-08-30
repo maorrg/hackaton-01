@@ -56,7 +56,7 @@ function Auth({ pageAccessLevel, children }: AuthProps) {
   const isUser = !!session?.user;
   React.useEffect(() => {
     if (status === "loading") return;
-    if (!isUser) router.push("/login");
+    if (!isUser) router.push("/");
   }, [isUser, status]);
 
   if (isUser) {
