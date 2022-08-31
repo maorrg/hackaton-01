@@ -3,15 +3,9 @@ import {
   AppShell,
   Navbar,
   Header,
-  Footer,
-  Aside,
-  Text,
   MediaQuery,
   Burger,
-  Group,
-  ActionIcon,
   useMantineTheme,
-  useMantineColorScheme,
 } from "@mantine/core";
 import { MainLinks } from "./_mainLinks";
 import { User } from "./_user";

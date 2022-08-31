@@ -6,12 +6,10 @@ import {
   Menu,
   UnstyledButton,
   Box,
-  Grid,
 } from "@mantine/core";
 import { useSession, signOut } from "next-auth/react";
 import { FiChevronRight } from "react-icons/fi";
 import { FiLogOut } from "react-icons/fi";
-import Router from "next/router";
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   image?: string;

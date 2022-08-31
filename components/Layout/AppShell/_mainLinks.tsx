@@ -3,6 +3,8 @@ import { MdOutlinePersonPin } from "react-icons/md";
 import { FaRegBuilding, FaShoppingBasket, FaUserAlt } from "react-icons/fa";
 import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
 import { useRouter } from "next/router";
+import { Role } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 interface MainLinkProps {
   icon: React.ReactNode;
@@ -49,16 +51,23 @@ const data = [
     color: "blue",
     label: "Feedback",
     route: "/feedback",
+    role: ["STUDENT"],
   },
   {
     icon: <MdOutlinePersonPin size={16} />,
     color: "teal",
     label: "Results",
     route: "/results",
+    role: ["TEACHER"],
   },
 ];
 
 export function MainLinks() {
-  const links = data.map((link) => <MainLink {...link} key={link.label} />);
+  const { data: session, status } = useSession();
+  const links = data.map((link) => {
+    if (link.role.includes(session?.user.role!)) {
+      return <MainLink {...link} key={link.label} />;
+    }
+  });
   return <div>{links}</div>;
 }
