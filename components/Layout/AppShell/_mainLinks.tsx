@@ -51,14 +51,14 @@ const data = [
     color: "blue",
     label: "Feedback",
     route: "/feedback",
-    role: ["STUDENT"],
+    role: ["ADMIN", "STUDENT"],
   },
   {
     icon: <MdOutlinePersonPin size={16} />,
     color: "teal",
     label: "Results",
     route: "/results",
-    role: ["TEACHER"],
+    role: ["ADMIN", "TEACHER"],
   },
 ];
 

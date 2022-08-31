@@ -82,7 +82,7 @@ model Feedback {
 enum Role {
   TEACHER
   STUDENT
-  GUEST
+  ADMIN
 }
 
 enum Status {
