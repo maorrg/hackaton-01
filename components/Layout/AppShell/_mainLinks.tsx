@@ -5,6 +5,7 @@ import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
 import { useRouter } from "next/router";
 import { Role } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import { MenuItem } from "@mantine/core/lib/Menu/MenuItem/MenuItem";
 
 interface MainLinkProps {
   icon: React.ReactNode;
@@ -45,7 +46,7 @@ function MainLink({ icon, color, label, route }: MainLinkProps) {
   );
 }
 
-const data = [
+const menuItems = [
   {
     icon: <FaRegBuilding size={16} />,
     color: "blue",
@@ -62,9 +63,15 @@ const data = [
   },
 ];
 
+export function GetCurrentRoute(route: string): any {
+  for (const item of menuItems) {
+    if (item.route === route) return item;
+  }
+}
+
 export function MainLinks() {
   const { data: session, status } = useSession();
-  const links = data.map((link) => {
+  const links = menuItems.map((link) => {
     if (link.role.includes(session?.user.role!)) {
       return <MainLink {...link} key={link.label} />;
     }

@@ -1,27 +1,29 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // Only needed when using a cloud provider that doesn't support the creation of new databases, like Heroku. Learn more: https://pris.ly/migrate-shadow
 }
 
-datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialActions"] // You won't need this in Prisma 3.X or higher.
 }
 
 model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
+  id                String  @id @default(cuid())
+  userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.String
-  access_token      String? @db.String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.String
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -30,53 +32,78 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String   @id @default(cuid())
   sessionToken String   @unique
-  userId       String   @db.ObjectId
+  userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id                String                       @id @default(auto()) @map("_id") @db.ObjectId
-  name              String?                      @default("")
-  lastname          String?                      @default("")
-  email             String                       @unique
-  emailVerified     DateTime?
-  password          String?
-  role              Role                         @default(STUDENT)
-  image             String?
-  accounts          Account[]
-  sessions          Session[]
-  courseAndFeedback TeacherAndCourseOnFeedback[]
-  feedbackIDs       String[]                     @db.ObjectId
-  feedback          Feedback[]                   @relation(fields: [feedbackIDs], references: [id])
+  id            String     @id @default(cuid())
+  name          String?
+  email         String?    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role       @default(STUDENT)
+  accounts      Account[]
+  sessions      Session[]
+  feedbacks     Feedback[]
+  sections      Section[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Teacher {
+  id                          Int                           @id @default(autoincrement())
+  name                        String
+  lastname                    String
+  sections                    Section[]
+  TeacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
 }
 
 model Course {
-  id                 String                       @id @default(auto()) @map("_id") @db.ObjectId
-  name               String
-  teacherAndFeedback TeacherAndCourseOnFeedback[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  sections Section[]
 }
 
-model TeacherAndCourseOnFeedback {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  teacher    User     @relation(fields: [teacherId], references: [id])
-  teacherId  String   @db.ObjectId
-  course     Course   @relation(fields: [courseId], references: [id])
-  courseId   String   @db.ObjectId
-  feedback   Feedback @relation(fields: [feedbackId], references: [id])
-  feedbackId String   @db.ObjectId
+model Section {
+  id                          Int                           @id @default(autoincrement())
+  code                        String                        @unique
+  teachers                    Teacher[]
+  course                      Course                        @relation(fields: [courseId], references: [id])
+  courseId                    Int
+  TeacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
+  users                       User[]
+}
 
-  @@unique([teacherId, courseId, feedbackId])
+model TeacherAndSectionOnFeedback {
+  teacher    Teacher  @relation(fields: [teacherId], references: [id])
+  teacherId  Int
+  section    Section  @relation(fields: [sectionId], references: [id])
+  sectionId  Int
+  feedback   Feedback @relation(fields: [feedbackId], references: [id])
+  feedbackId Int
+
+  @@id([teacherId, sectionId, feedbackId])
 }
 
 model Feedback {
-  id               String                       @id @default(auto()) @map("_id") @db.ObjectId
-  teacherAndCourse TeacherAndCourseOnFeedback[]
-  userIDs          String[]                     @db.ObjectId
-  students         User[]                       @relation(fields: [userIDs], references: [id])
-  createdAt        DateTime                     @default(now())
+  id                          Int                           @id @default(autoincrement())
+  rating                      String
+  comment                     String
+  suggestion                  String
+  userId                      String
+  user                        User                          @relation(fields: [userId], references: [id])
+  createdAt                   DateTime                      @default(now())
+  TeacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
 }
 
 enum Role {
