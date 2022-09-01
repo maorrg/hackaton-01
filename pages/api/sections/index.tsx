@@ -31,6 +31,7 @@ export default async function handle(
   res: NextApiResponse
 ) {
   const session = await getSession({ req });
+  console.log(session);
   if (session) {
     switch (req.method) {
       case "GET":
