@@ -4,6 +4,7 @@ import {
   Center,
   Grid,
   Group,
+  Loader,
   LoadingOverlay,
   Select,
   Slider,
@@ -85,7 +86,7 @@ const ViewFeedback = () => {
 
   return (
     <Box sx={{ maxWidth: 900 }} mx="auto">
-      <LoadingOverlay visible={isLoading} overlayBlur={1} />
+      {/* <LoadingOverlay visible={isLoading} overlayBlur={1} /> */}
       <Title mb="sm" mt="lg">
         Registrar feedback
       </Title>
@@ -110,6 +111,7 @@ const ViewFeedback = () => {
                     value={course}
                     onChange={handleChange}
                     data={courses}
+                    rightSection={isLoading ? <Loader size="xs" /> : false}
                   />
                 </Grid.Col>
                 <Grid.Col span={6}>
@@ -125,7 +127,12 @@ const ViewFeedback = () => {
                       placeholder="Seleccione el profesor"
                       data={teachersForSelectedCourse}
                       readOnly
-                      value={teachersForSelectedCourse[0] !== undefined ? teachersForSelectedCourse[0].value : ''}
+                      disabled
+                      value={
+                        teachersForSelectedCourse[0] !== undefined
+                          ? teachersForSelectedCourse[0].value
+                          : ""
+                      }
                     />
                   )}
                 </Grid.Col>
