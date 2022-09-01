@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getToken } from "next-auth/jwt";
 import { getSession } from "next-auth/react";
 import prisma from "../../../utils/prisma";
 
@@ -8,13 +9,13 @@ const makeSectionsSelectable = (sections: any) => {
   response["teachers"] = {};
   sections.forEach((section: any) => {
     response["courses"].push({
-      value: (section.course.id).toString(),
+      value: section.course.id.toString(),
       label: section.course.name,
     });
     const courseTeachers: any = [];
     section.teachers.forEach((teacher: any) => {
       courseTeachers.push({
-        value: (teacher.id).toString(),
+        value: teacher.id.toString(),
         label: `${teacher.name} ${teacher.lastname}`,
       });
     });
@@ -30,14 +31,14 @@ export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await getSession({ req });
-  console.log(session);
-  if (session) {
+  //   const session = await getSession({ req });
+  const token = await getToken({ req });
+  if (token) {
     switch (req.method) {
       case "GET":
         const data: any = await prisma.user.findUnique({
           where: {
-            email: session.user.email!,
+            email: token.email!,
           },
           select: {
             sections: {
