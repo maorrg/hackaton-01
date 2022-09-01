@@ -31,14 +31,13 @@ export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  //   const session = await getSession({ req });
-  const token = await getToken({ req });
-  if (token) {
+  const session = await getSession({ req });
+  if (session) {
     switch (req.method) {
       case "GET":
         const data: any = await prisma.user.findUnique({
           where: {
-            email: token.email!,
+            email: session.user.email!,
           },
           select: {
             sections: {
