@@ -33,7 +33,7 @@ export default function App(
       </Head>
       <MantineProvider withGlobalStyles withNormalizeCSS>
         <SessionProvider session={pageProps?.session}>
-          {Component.auth?.role && ((Component.auth.role !== Role.STUDENT))  ? (
+          {Component.auth?.role && Component.auth.role !== Role.STUDENT ? (
             <Auth pageAccessLevel={Component.auth.role}>
               <Component {...pageProps} />
             </Auth>
@@ -68,12 +68,7 @@ function Auth({ pageAccessLevel, children }: AuthProps) {
     ) {
       return children;
     } else {
-      return (
-        <Unauthorized
-          user={session.user}
-          isGuest={session.user.role === Role.STUDENT}
-        />
-      );
+      return <Unauthorized user={session.user} />;
     }
   }
 
