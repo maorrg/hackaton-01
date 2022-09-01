@@ -108,22 +108,27 @@ const ViewFeedback = () => {
                   <Select
                     label="Curso"
                     placeholder="Seleccione el curso a califacar"
+                    description="Seleccione el curso que desea calficar."
                     value={course}
                     onChange={handleChange}
                     data={courses}
                     rightSection={isLoading ? <Loader size="xs" /> : false}
+                    required
                   />
                 </Grid.Col>
                 <Grid.Col span={6}>
                   {teachersForSelectedCourse.length > 1 ? (
                     <Select
                       label="Profesor"
+                      description="Seleccione el profesor que desea evaluar."
                       placeholder="Seleccione el profesor"
                       data={teachersForSelectedCourse}
+                      required
                     />
                   ) : (
                     <Select
                       label="Profesor"
+                      description="Seleccione el profesor que desea evaluar."
                       placeholder="Seleccione el profesor"
                       data={teachersForSelectedCourse}
                       readOnly
@@ -133,6 +138,7 @@ const ViewFeedback = () => {
                           ? teachersForSelectedCourse[0].value
                           : ""
                       }
+                      required
                     />
                   )}
                 </Grid.Col>
@@ -145,9 +151,19 @@ const ViewFeedback = () => {
               icon={<AiTwotoneStar size={18} />}
             >
               <Title order={3}>Calificación</Title>
-              <Center>
-                <ReactStars count={5} size={40} color2={"#ffd700"} />
-              </Center>
+              <Box
+                sx={(theme) => ({
+                  backgroundColor: theme.colors.gray[1],
+                  textAlign: "center",
+                  padding: theme.spacing.xl,
+                  borderRadius: theme.radius.md,
+                  cursor: "pointer",
+                })}
+              >
+                <Center>
+                  <ReactStars count={5} size={40} color2={"#ffd700"} />
+                </Center>
+              </Box>
             </Stepper.Step>
             <Stepper.Step
               label="Comentario"
@@ -157,8 +173,15 @@ const ViewFeedback = () => {
             >
               <Textarea
                 label="Comentario"
+                description="Cuentanos un poco sobre tu experiencia en el curso, tanto los puntos positivos como los que debemos mejorar."
                 placeholder="Escriba su comentario aquí."
                 required
+              />
+              <Textarea
+                style={{marginTop: 10}}
+                label="Sugerencia"
+                description="Puedes escribir cualquier sugerencia que tengas hacia el curso."
+                placeholder="Escriba su comentario aquí."
               />
             </Stepper.Step>
             <Stepper.Completed>
@@ -166,10 +189,12 @@ const ViewFeedback = () => {
             </Stepper.Completed>
           </Stepper>
 
-          <Group position="center" mt="xl">
-            <Button variant="default" onClick={prevStep}>
-              Anterior
-            </Button>
+          <Group position="right" mt="xl">
+            {active && (
+              <Button variant="default" onClick={prevStep}>
+                Anterior
+              </Button>
+            )}
             <Button onClick={nextStep}>Siguiente</Button>
           </Group>
         </>
