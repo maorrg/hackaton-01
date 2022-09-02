@@ -40,16 +40,17 @@ model Session {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  name          String?
-  email         String?    @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role       @default(STUDENT)
-  accounts      Account[]
-  sessions      Session[]
-  feedbacks     Feedback[]
-  sections      Section[]
+  id                     String                  @id @default(cuid())
+  name                   String?
+  email                  String?                 @unique
+  emailVerified          DateTime?
+  image                  String?
+  role                   Role                    @default(STUDENT)
+  accounts               Account[]
+  sessions               Session[]
+  feedbacks              Feedback[]
+  sections               Section[]
+  userSecurityValidation UserSecurityValidation?
 }
 
 model VerificationToken {
@@ -104,6 +105,22 @@ model Feedback {
   user                        User                          @relation(fields: [userId], references: [id])
   createdAt                   DateTime                      @default(now())
   TeacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
+}
+
+model SecurityQuestion {
+  id                     Int                      @id @default(autoincrement())
+  title                  String
+  question               String
+  userSecurityValidation UserSecurityValidation[]
+}
+
+model UserSecurityValidation {
+  id                 Int              @id @default(autoincrement())
+  answer             String
+  securityQuestion   SecurityQuestion @relation(fields: [securityQuestionId], references: [id])
+  securityQuestionId Int
+  user               User             @relation(fields: [userId], references: [id])
+  userId             String           @unique
 }
 
 enum Role {

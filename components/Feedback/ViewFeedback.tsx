@@ -24,30 +24,17 @@ import {
   AiOutlineUnorderedList,
   AiTwotoneStar,
 } from "react-icons/ai";
+import { TbSend } from "react-icons/tb";
 import ReactStars from "react-stars";
-
-const createFeedback = (values: any) => {
-  axios
-    .post(`/api/feedback`, { formValues: values })
-    .then((res) => {
-      showNotification({
-        title: "¡Influencer creado correctamente!",
-        message: "El influencer fue creado correctamente.",
-        autoClose: 5000,
-        color: "teal",
-        icon: <FiCheck size={20} />,
-      });
-    })
-    .catch((err) => {
-      handleErrorMessageForFeedback(err);
-    });
-};
+import { useRouter } from "next/router";
 
 const buildFormInitialValues = () => {
   return {
+    courseId: "",
+    teacherId: "",
     rating: "",
     comment: "",
-    course: "",
+    sugestion: "",
   };
 };
 
@@ -60,13 +47,28 @@ const ViewFeedback = () => {
   const [teachersForSelectedCourse, setTeachersForSelectedCourse] = useState<
     any[]
   >([]);
+
+  const router = useRouter();
+
   const nextStep = () =>
     setActive((current) => (current < 3 ? current + 1 : current));
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
+
   const form = useForm({
     initialValues: buildFormInitialValues(),
   });
+
+  const createFeedback = (values: any) => {
+    axios
+      .post(`/api/feedback`, { formValues: values })
+      .then((res) => {
+        nextStep();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -79,9 +81,16 @@ const ViewFeedback = () => {
     });
   }, []);
 
-  const handleChange = (value: string) => {
+  const handleCourseChange = (value: string) => {
     setTeachersForSelectedCourse(teachers[value]);
     setCourse(value);
+    if (teachersForSelectedCourse.length === 0)
+      form.setFieldValue("teacherId", teachersForSelectedCourse[0]?.value);
+    form.setFieldValue("courseId", value);
+  };
+
+  const handleTeacherChange = (value: string) => {
+    form.setFieldValue("teacherId", value);
   };
 
   return (
@@ -110,7 +119,7 @@ const ViewFeedback = () => {
                     placeholder="Seleccione el curso a califacar"
                     description="Seleccione el curso que desea calficar."
                     value={course}
-                    onChange={handleChange}
+                    onChange={handleCourseChange}
                     data={courses}
                     rightSection={isLoading ? <Loader size="xs" /> : false}
                     required
@@ -124,6 +133,8 @@ const ViewFeedback = () => {
                       placeholder="Seleccione el profesor"
                       data={teachersForSelectedCourse}
                       required
+                      onChange={handleTeacherChange}
+                      value={form.values.teacherId}
                     />
                   ) : (
                     <Select
@@ -161,7 +172,12 @@ const ViewFeedback = () => {
                 })}
               >
                 <Center>
-                  <ReactStars count={5} size={40} color2={"#ffd700"} />
+                  <ReactStars
+                    count={5}
+                    size={40}
+                    color2={"#ffd700"}
+                    {...form.getInputProps("rating")}
+                  />
                 </Center>
               </Box>
             </Stepper.Step>
@@ -176,27 +192,41 @@ const ViewFeedback = () => {
                 description="Cuentanos un poco sobre tu experiencia en el curso, tanto los puntos positivos como los que debemos mejorar."
                 placeholder="Escriba su comentario aquí."
                 required
+                {...form.getInputProps("comment")}
               />
               <Textarea
-                style={{marginTop: 10}}
+                style={{ marginTop: 10 }}
                 label="Sugerencia"
                 description="Puedes escribir cualquier sugerencia que tengas hacia el curso."
                 placeholder="Escriba su comentario aquí."
+                {...form.getInputProps("sugestion")}
               />
             </Stepper.Step>
-            <Stepper.Completed>
-              Completed, click back button to get to previous step
-            </Stepper.Completed>
+            <Stepper.Completed>¡Gracias por el Feedback!</Stepper.Completed>
           </Stepper>
 
-          <Group position="right" mt="xl">
-            {active && (
-              <Button variant="default" onClick={prevStep}>
-                Anterior
+          {active <= 2 ? (
+            <Group position="right" mt="xl">
+              {active && (
+                <Button variant="default" onClick={prevStep}>
+                  Anterior
+                </Button>
+              )}
+              {active < 2 ? (
+                <Button onClick={nextStep}>Siguiente</Button>
+              ) : (
+                <Button type="submit" leftIcon={<TbSend size={16} />}>
+                  Enviar
+                </Button>
+              )}
+            </Group>
+          ) : (
+            <Group position="right" mt="xl">
+              <Button onClick={() => router.reload()}>
+                Completar otro formulario
               </Button>
-            )}
-            <Button onClick={nextStep}>Siguiente</Button>
-          </Group>
+            </Group>
+          )}
         </>
       </form>
     </Box>

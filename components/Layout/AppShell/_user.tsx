@@ -10,6 +10,8 @@ import {
 import { useSession, signOut } from "next-auth/react";
 import { FiChevronRight } from "react-icons/fi";
 import { FiLogOut } from "react-icons/fi";
+import { useRouter } from "next/router";
+import { MdOutlineSecurity } from "react-icons/md";
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   image?: string;
@@ -57,6 +59,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
 
 export function User() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   return (
     <Group position="center">
       <Menu withArrow position="right" shadow="md" width={200}>
@@ -71,6 +74,9 @@ export function User() {
           <Menu.Label>Cuenta</Menu.Label>
           <Menu.Item onClick={() => signOut()} icon={<FiLogOut size={14} />}>
             Cerrar Sesión
+          </Menu.Item>
+          <Menu.Item onClick={() => router.replace("/security-settings")} icon={<MdOutlineSecurity size={14} />}>
+            Ajustes de seguridad
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
