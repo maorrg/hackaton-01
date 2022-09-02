@@ -8,6 +8,7 @@ import { NextPageWithAuth } from "../types/nextPageAuth";
 import { NextComponentType, NextPageContext } from "next/types";
 import { Role } from "../types/role";
 import { Unauthorized } from "../components/Unauthorized";
+import { NotificationsProvider } from "@mantine/notifications";
 type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> &
   Partial<NextPageWithAuth>;
 
@@ -32,15 +33,17 @@ export default function App(
         />
       </Head>
       <MantineProvider withGlobalStyles withNormalizeCSS>
-        <SessionProvider session={pageProps?.session}>
-          {Component.auth?.role && Component.auth.role !== Role.STUDENT ? (
-            <Auth pageAccessLevel={Component.auth.role}>
+        <NotificationsProvider>
+          <SessionProvider session={pageProps?.session}>
+            {Component.auth?.role && Component.auth.role !== Role.STUDENT ? (
+              <Auth pageAccessLevel={Component.auth.role}>
+                <Component {...pageProps} />
+              </Auth>
+            ) : (
               <Component {...pageProps} />
-            </Auth>
-          ) : (
-            <Component {...pageProps} />
-          )}
-        </SessionProvider>
+            )}
+          </SessionProvider>
+        </NotificationsProvider>
       </MantineProvider>
     </>
   );

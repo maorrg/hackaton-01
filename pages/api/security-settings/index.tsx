@@ -15,14 +15,21 @@ export default async function handle(
     switch (req.method) {
       case "POST":
         const data = req.body.formValues;
-        const userSecurityValidation =
-          await prisma.userSecurityValidation.create({
-            data: {
-              answer: data.answer,
-              securityQuestionId: data.securityQuestionId,
-              userEmail: session.user.email!,
-            },
-          });
+        const bcrypt = require("bcryptjs");
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(data.answer, salt);
+        try {
+          const createUserSecurityValidation =
+            await prisma.userSecurityValidation.create({
+              data: {
+                answer: hash,
+                securityQuestionId: data.securityQuestionId,
+                userEmail: session.user.email!,
+              },
+            });
+        } catch (err) {
+          return res.status(401).json({ message: "Método no permitido." });
+        }
         return res
           .status(200)
           .json({ message: "Pregunta de seguridad creada correctamente." });

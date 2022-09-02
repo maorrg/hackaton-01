@@ -1,32 +1,34 @@
 import {
+  Alert,
   Box,
   Button,
   Center,
   Grid,
   Group,
+  Input,
   Loader,
-  LoadingOverlay,
+  Modal,
   Select,
-  Slider,
   Stepper,
   Textarea,
-  TextInput,
   Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { Feedback } from "@prisma/client";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FiCheck } from "react-icons/fi";
 import {
-  AiFillStar,
   AiOutlineComment,
   AiOutlineUnorderedList,
   AiTwotoneStar,
 } from "react-icons/ai";
-import { TbSend } from "react-icons/tb";
+import { TbLock, TbSend } from "react-icons/tb";
 import ReactStars from "react-stars";
 import { useRouter } from "next/router";
+import { showNotification } from "@mantine/notifications";
+import { MdQuestionAnswer } from "react-icons/md";
+import { IoIosRemoveCircle } from "react-icons/io";
+import { BsFillCheckCircleFill } from "react-icons/bs";
 
 const buildFormInitialValues = () => {
   return {
@@ -35,13 +37,17 @@ const buildFormInitialValues = () => {
     rating: "",
     comment: "",
     suggestion: "",
+    securityQuestionId: "",
+    answer: "",
   };
 };
 
 const ViewFeedback = () => {
   const [active, setActive] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [opened, setOpened] = useState(false);
   const [courses, setCourses] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const [course, setCourse] = useState<string | null>(null);
   const [teachers, setTeachers] = useState<{ [courseName: string]: [] }>({});
   const [teachersForSelectedCourse, setTeachersForSelectedCourse] = useState<
@@ -49,6 +55,15 @@ const ViewFeedback = () => {
   >([]);
 
   const router = useRouter();
+
+  const formStepperValidation = (current: number) => {
+    switch (current) {
+      case 1: {
+        if (form.values.teacherId && form.values.courseId) return true;
+        return false;
+      }
+    }
+  };
 
   const nextStep = () =>
     setActive((current) => (current < 3 ? current + 1 : current));
@@ -59,15 +74,34 @@ const ViewFeedback = () => {
     initialValues: buildFormInitialValues(),
   });
 
+  const handleSubmit = () => {
+    createFeedback(form.values);
+  };
+
   const createFeedback = (values: any) => {
     axios
       .post(`/api/feedback`, { values })
       .then((res) => {
+        setOpened(false);
         nextStep();
       })
       .catch((err) => {
-        console.log(err);
+        form.setFieldValue("securityQuestionId", "");
+        form.setFieldValue("answer", "");
+        setOpened(false);
+        showNotification({
+          title: "¡Error de autentificación!",
+          message:
+            "Las credenciales ingresadas son incorrectas, intente nuevamente.",
+          autoClose: 5000,
+          color: "red",
+          icon: <IoIosRemoveCircle size={20} />,
+        });
       });
+  };
+
+  const validateSecurity = () => {
+    setOpened(true);
   };
 
   useEffect(() => {
@@ -78,11 +112,17 @@ const ViewFeedback = () => {
       setTeachers(res.data.teachers);
       setIsLoading(false);
     });
+    setIsLoading(true);
+    axios.get(`/api/security-settings/questions`).then(async (res) => {
+      setIsLoading(false);
+      setQuestions(res.data);
+    });
   }, []);
 
   const handleCourseChange = (value: string) => {
     setTeachersForSelectedCourse(teachers[value]);
     setCourse(value);
+    form.setFieldValue("teacherId", "");
     const array: any = teachers[value];
     if (array.length < 2) {
       form.setFieldValue("teacherId", array[0].value);
@@ -101,9 +141,9 @@ const ViewFeedback = () => {
         Registrar feedback
       </Title>
       <form
-        onSubmit={form.onSubmit((values) => {
-          createFeedback(values);
-        })}
+      // onSubmit={form.onSubmit((values) => {
+      //   createFeedback(values);
+      // })}
       >
         <>
           <Stepper active={active} onStepClick={setActive} breakpoint="sm">
@@ -189,6 +229,44 @@ const ViewFeedback = () => {
               allowStepSelect={active > 2}
               icon={<AiOutlineComment size={18} />}
             >
+              <Modal
+                opened={opened}
+                onClose={() => setOpened(false)}
+                title="Validación de seguridad"
+              >
+                <Select
+                  label="Seleccione su pregunta de seguridad"
+                  description="Se le realizará esta pregunta cada vez que desea dar feedbakc sobre un curso."
+                  placeholder="Seleccione una pregunta"
+                  data={questions}
+                  rightSection={isLoading ? <Loader size="xs" /> : false}
+                  required
+                  {...form.getInputProps("securityQuestionId")}
+                />
+                <Input.Wrapper
+                  label="Respuesta"
+                  description="Ingrese la respuesta a la pregunta."
+                  required
+                  style={{ marginTop: 10 }}
+                >
+                  <Input
+                    icon={<MdQuestionAnswer />}
+                    placeholder="Su respuesta"
+                    required
+                    {...form.getInputProps("answer")}
+                  />
+                </Input.Wrapper>
+                <Group position="center" mt="xl">
+                  <Button
+                    style={{ marginTop: 5, width: 1000}}
+                    type="submit"
+                    leftIcon={<TbLock size={16} />}
+                    onClick={handleSubmit}
+                  >
+                    Validar
+                  </Button>
+                </Group>
+              </Modal>
               <Textarea
                 label="Comentario"
                 description="Cuentanos un poco sobre tu experiencia en el curso, tanto los puntos positivos como los que debemos mejorar."
@@ -204,7 +282,14 @@ const ViewFeedback = () => {
                 {...form.getInputProps("suggestion")}
               />
             </Stepper.Step>
-            <Stepper.Completed>¡Gracias por el Feedback!</Stepper.Completed>
+            <Stepper.Completed>
+              <Alert
+                icon={<BsFillCheckCircleFill size={16} />}
+                title="¡Gracias por el feedback!"
+              >
+                Constantemente buscamos ser mejores, gracias por formar parte.
+              </Alert>
+            </Stepper.Completed>
           </Stepper>
 
           {active <= 2 ? (
@@ -217,7 +302,10 @@ const ViewFeedback = () => {
               {active < 2 ? (
                 <Button onClick={nextStep}>Siguiente</Button>
               ) : (
-                <Button type="submit" leftIcon={<TbSend size={16} />}>
+                <Button
+                  onClick={validateSecurity}
+                  leftIcon={<TbSend size={16} />}
+                >
                   Enviar
                 </Button>
               )}
@@ -236,45 +324,3 @@ const ViewFeedback = () => {
 };
 
 export default ViewFeedback;
-function showNotification(arg0: {
-  title: string;
-  message: string;
-  autoClose: number;
-  color: string;
-  icon: JSX.Element;
-}) {
-  throw new Error("Function not implemented.");
-}
-
-function handleErrorMessageForFeedback(err: any) {
-  if (
-    err.response.data.code === "P2002" &&
-    err.response.data.meta.target == "Influencer_username_key"
-  ) {
-    showNotification({
-      title: "¡ERROR!",
-      message: "El influencer fue creado correctamente.",
-      autoClose: 5000,
-      color: "red",
-      icon: <FiCheck size={20} />,
-    });
-  } else if (
-    err.response.data.code === "P2002" &&
-    err.response.data.meta.target == "Influencer_userId_key"
-  )
-    showNotification({
-      title: "¡ERROR!",
-      message: "El influencer fue creado correctamente.",
-      autoClose: 5000,
-      color: "red",
-      icon: <FiCheck size={20} />,
-    });
-  else
-    showNotification({
-      title: "¡ERROR!",
-      message: "El influencer fue creado correctamente.",
-      autoClose: 5000,
-      color: "red",
-      icon: <FiCheck size={20} />,
-    });
-}

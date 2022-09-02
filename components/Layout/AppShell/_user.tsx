@@ -1,12 +1,5 @@
 import { forwardRef } from "react";
-import {
-  Group,
-  Avatar,
-  Text,
-  Menu,
-  UnstyledButton,
-  Box,
-} from "@mantine/core";
+import { Group, Avatar, Text, Menu, UnstyledButton, Box } from "@mantine/core";
 import { useSession, signOut } from "next-auth/react";
 import { FiChevronRight } from "react-icons/fi";
 import { FiLogOut } from "react-icons/fi";
@@ -72,11 +65,14 @@ export function User() {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Label>Cuenta</Menu.Label>
+          <Menu.Item
+            onClick={() => router.replace("/security-settings")}
+            icon={<MdOutlineSecurity size={14} />}
+          >
+            Ajustes de seguridad
+          </Menu.Item>
           <Menu.Item onClick={() => signOut()} icon={<FiLogOut size={14} />}>
             Cerrar Sesión
-          </Menu.Item>
-          <Menu.Item onClick={() => router.replace("/security-settings")} icon={<MdOutlineSecurity size={14} />}>
-            Ajustes de seguridad
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

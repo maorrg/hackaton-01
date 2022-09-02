@@ -60,7 +60,7 @@ const SecurityQuestions = () => {
   }, []);
 
   if (isLoading) return <LoadingOverlay visible={isLoading} overlayBlur={1} />;
-  if (!user) return <p>No profile data</p>;
+  if (!user) return <LoadingOverlay visible={isLoading} overlayBlur={1} />;
 
   return (
     <>
