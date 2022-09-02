@@ -13,10 +13,21 @@ import { useRouter } from "next/router";
 import BackOfficeShell from "../components/Layout/AppShell/BackOfficeShell";
 import { Role } from "../types/role";
 import LoginForm from "../components/Login/LoginForm";
+import axios from "axios";
+import { useEffect } from "react";
 
 const Home = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  useEffect(() => {
+    axios.get(`/api/user`).then(async (res) => {
+      const user = res.data;
+      if (user.userSecurityValidation === null) {
+        router.replace("/security-settings");
+      }
+    });
+  }, []);
+
   if (session) {
     return (
       <>
@@ -27,9 +38,6 @@ const Home = () => {
             <br />
           </Title>
         </BackOfficeShell>
-        <Group>
-          <Button onClick={() => signOut()}>Cerrar Sesión</Button>
-        </Group>
       </>
     );
   } else {

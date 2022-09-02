@@ -42,7 +42,7 @@ model Session {
 model User {
   id                     String                  @id @default(cuid())
   name                   String?
-  email                  String?                 @unique
+  email                  String                  @unique
   emailVerified          DateTime?
   image                  String?
   role                   Role                    @default(STUDENT)
@@ -81,7 +81,7 @@ model Section {
   teachers                    Teacher[]
   course                      Course                        @relation(fields: [courseId], references: [id])
   courseId                    Int
-  TeacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
+  teacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
   users                       User[]
 }
 
@@ -91,20 +91,20 @@ model TeacherAndSectionOnFeedback {
   section    Section  @relation(fields: [sectionId], references: [id])
   sectionId  Int
   feedback   Feedback @relation(fields: [feedbackId], references: [id])
-  feedbackId Int
+  feedbackId Int      @unique
 
   @@id([teacherId, sectionId, feedbackId])
 }
 
 model Feedback {
-  id                          Int                           @id @default(autoincrement())
+  id                          Int                          @id @default(autoincrement())
   rating                      String
   comment                     String
   suggestion                  String
-  userId                      String
-  user                        User                          @relation(fields: [userId], references: [id])
-  createdAt                   DateTime                      @default(now())
-  TeacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
+  userEmail                   String
+  user                        User                         @relation(fields: [userEmail], references: [email])
+  createdAt                   DateTime                     @default(now())
+  teacherAndSectionOnFeedback TeacherAndSectionOnFeedback?
 }
 
 model SecurityQuestion {
@@ -115,12 +115,12 @@ model SecurityQuestion {
 }
 
 model UserSecurityValidation {
-  id                 Int              @id @default(autoincrement())
+  id                 Int               @id @default(autoincrement())
   answer             String
-  securityQuestion   SecurityQuestion @relation(fields: [securityQuestionId], references: [id])
+  securityQuestion   SecurityQuestion? @relation(fields: [securityQuestionId], references: [id])
   securityQuestionId Int
-  user               User             @relation(fields: [userId], references: [id])
-  userId             String           @unique
+  user               User?             @relation(fields: [userEmail], references: [email])
+  userEmail          String            @unique
 }
 
 enum Role {

@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getToken } from "next-auth/jwt";
 import { getSession } from "next-auth/react";
 import prisma from "../../../utils/prisma";
 
-// POST /api/post
+// GET /api/get
 // Required fields in body: title
 // Optional fields in body: content
 export default async function handle(
@@ -13,19 +12,20 @@ export default async function handle(
   const session = await getSession({ req });
   if (session) {
     switch (req.method) {
-      case "POST":
-        const data = req.body.formValues;
-        const userSecurityValidation =
-          await prisma.userSecurityValidation.create({
-            data: {
-              answer: data.answer,
-              securityQuestionId: data.securityQuestionId,
-              userEmail: session.user.email!,
+      case "GET":
+        const user = await prisma.user.findUnique({
+          where: { email: session.user.email! },
+          select: {
+            id: true,
+            email: true,
+            userSecurityValidation: {
+              select: {
+                id: true,
+              },
             },
-          });
-        return res
-          .status(200)
-          .json({ message: "Pregunta de seguridad creada correctamente." });
+          },
+        });
+        return res.status(200).json(user);
       default:
         return res.status(401).send({ message: "Unauthorized Method" });
     }
