@@ -106,6 +106,12 @@ const ViewFeedback = () => {
 
   useEffect(() => {
     setIsLoading(true);
+    axios.get(`/api/user`).then(async (res) => {
+      const user = res.data;
+      if (user.userSecurityValidation === null) {
+        router.replace("/security-settings");
+      }
+    });
     axios.get(`/api/sections`).then((res) => {
       setIsLoading(false);
       setCourses(res.data.courses);
@@ -258,7 +264,7 @@ const ViewFeedback = () => {
                 </Input.Wrapper>
                 <Group position="center" mt="xl">
                   <Button
-                    style={{ marginTop: 5, width: 1000}}
+                    style={{ marginTop: 5, width: 1000 }}
                     type="submit"
                     leftIcon={<TbLock size={16} />}
                     onClick={handleSubmit}
