@@ -101,8 +101,8 @@ model Feedback {
   rating                      String
   comment                     String
   suggestion                  String
-  userEmail                   String
   user                        User                         @relation(fields: [userEmail], references: [email])
+  userEmail                   String
   createdAt                   DateTime                     @default(now())
   teacherAndSectionOnFeedback TeacherAndSectionOnFeedback?
 }

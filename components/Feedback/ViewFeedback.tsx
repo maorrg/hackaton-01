@@ -34,7 +34,7 @@ const buildFormInitialValues = () => {
     teacherId: "",
     rating: "",
     comment: "",
-    sugestion: "",
+    suggestion: "",
   };
 };
 
@@ -61,7 +61,7 @@ const ViewFeedback = () => {
 
   const createFeedback = (values: any) => {
     axios
-      .post(`/api/feedback`, { formValues: values })
+      .post(`/api/feedback`, { values })
       .then((res) => {
         nextStep();
       })
@@ -77,15 +77,16 @@ const ViewFeedback = () => {
       setCourses(res.data.courses);
       setTeachers(res.data.teachers);
       setIsLoading(false);
-      setCourse("");
     });
   }, []);
 
   const handleCourseChange = (value: string) => {
     setTeachersForSelectedCourse(teachers[value]);
     setCourse(value);
-    if (teachersForSelectedCourse.length === 0)
-      form.setFieldValue("teacherId", teachersForSelectedCourse[0]?.value);
+    const array: any = teachers[value];
+    if (array.length < 2) {
+      form.setFieldValue("teacherId", array[0].value);
+    }
     form.setFieldValue("courseId", value);
   };
 
@@ -142,6 +143,7 @@ const ViewFeedback = () => {
                       description="Seleccione el profesor que desea evaluar."
                       placeholder="Seleccione el profesor"
                       data={teachersForSelectedCourse}
+                      onChange={handleTeacherChange}
                       readOnly
                       disabled
                       value={
@@ -199,7 +201,7 @@ const ViewFeedback = () => {
                 label="Sugerencia"
                 description="Puedes escribir cualquier sugerencia que tengas hacia el curso."
                 placeholder="Escriba su comentario aquí."
-                {...form.getInputProps("sugestion")}
+                {...form.getInputProps("suggestion")}
               />
             </Stepper.Step>
             <Stepper.Completed>¡Gracias por el Feedback!</Stepper.Completed>
