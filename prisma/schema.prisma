@@ -90,7 +90,7 @@ model TeacherAndSectionOnFeedback {
   teacherId  Int
   section    Section  @relation(fields: [sectionId], references: [id])
   sectionId  Int
-  feedback   Feedback @relation(fields: [feedbackId], references: [id])
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
   feedbackId Int      @unique
 
   @@id([teacherId, sectionId, feedbackId])
@@ -117,9 +117,9 @@ model SecurityQuestion {
 model UserSecurityValidation {
   id                 Int               @id @default(autoincrement())
   answer             String
-  securityQuestion   SecurityQuestion? @relation(fields: [securityQuestionId], references: [id])
+  securityQuestion   SecurityQuestion? @relation(fields: [securityQuestionId], references: [id], onDelete: Cascade)
   securityQuestionId Int
-  user               User?             @relation(fields: [userEmail], references: [email])
+  user               User?             @relation(fields: [userEmail], references: [email], onDelete: Cascade)
   userEmail          String            @unique
 }
 
