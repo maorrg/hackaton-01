@@ -9,17 +9,6 @@ const ViewResults = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    // setIsLoading(true);
-    // axios.get(`/api/user`).then(async (res) => {
-    //   const user = res.data;
-    //   if (user.userSecurityValidation === null) {
-    //     router.replace("/security-settings");
-    //   }
-    // });
-    // axios.get();
-  }, []);
-
   return (
     <Box sx={{ maxWidth: 900 }} mx="auto">
       <h1>Resultados</h1>

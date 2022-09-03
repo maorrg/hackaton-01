@@ -98,7 +98,7 @@ model TeacherAndSectionOnFeedback {
 
 model Feedback {
   id                          Int                          @id @default(autoincrement())
-  rating                      String
+  rating                      Float
   comment                     String
   suggestion                  String
   user                        User                         @relation(fields: [userEmail], references: [email])

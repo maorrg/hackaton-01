@@ -69,7 +69,7 @@ export default async function handle(
         });
         const feedback = await prisma.feedback.create({
           data: {
-            rating: data.rating.toString(),
+            rating: data.rating,
             comment: data.comment,
             suggestion: data.suggestion,
             teacherAndSectionOnFeedback: {
