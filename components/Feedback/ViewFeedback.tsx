@@ -163,7 +163,7 @@ const ViewFeedback = () => {
                 <Grid.Col span={6}>
                   <Select
                     label="Curso"
-                    placeholder="Seleccione el curso a califacar"
+                    placeholder="Seleccione el curso a calificar"
                     description="Seleccione el curso que desea calficar."
                     value={course}
                     onChange={handleCourseChange}
