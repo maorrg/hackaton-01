@@ -110,8 +110,8 @@ const SecurityQuestions = () => {
             title="¡Pregunta de seguridad establecida!"
             color="yellow"
           >
-            Si tiene problemas con su cuenta y desea reestablecer su pregunta de
-            seguridad por favor comuníquese con soporte.
+            Si tienes problemas con tu cuenta y deseas reestablecer la pregunta de
+            seguridad, por favor comunícate con soporte.
           </Alert>
         </Container>
       )}

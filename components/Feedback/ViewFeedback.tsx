@@ -281,8 +281,8 @@ const ViewFeedback = () => {
               >
                 <Select
                   label="Seleccione su pregunta de seguridad"
-                  description="Se le realizará esta pregunta cada vez que desea dar feedbakc sobre un curso."
-                  placeholder="Seleccione una pregunta"
+                  description="Seleccione la misma pregunta que escogió en la configuración de seguridad."
+                  placeholder="Seleccione su pregunta"
                   data={questions}
                   rightSection={isLoading ? <Loader size="xs" /> : false}
                   required
