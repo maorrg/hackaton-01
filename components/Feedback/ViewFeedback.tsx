@@ -29,6 +29,7 @@ import { showNotification } from "@mantine/notifications";
 import { MdQuestionAnswer } from "react-icons/md";
 import { IoIosRemoveCircle } from "react-icons/io";
 import { BsFillCheckCircleFill } from "react-icons/bs";
+import { FiAlertCircle } from "react-icons/fi";
 
 const buildFormInitialValues = () => {
   return {
@@ -48,6 +49,7 @@ const ViewFeedback = () => {
   const [opened, setOpened] = useState(false);
   const [courses, setCourses] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [formError, setFormError] = useState(false);
   const [course, setCourse] = useState<string | null>(null);
   const [teachers, setTeachers] = useState<{ [courseName: string]: [] }>({});
   const [teachersForSelectedCourse, setTeachersForSelectedCourse] = useState<
@@ -58,15 +60,29 @@ const ViewFeedback = () => {
 
   const formStepperValidation = (current: number) => {
     switch (current) {
-      case 1: {
+      case 0: {
         if (form.values.teacherId && form.values.courseId) return true;
+        return false;
+      }
+      case 1: {
+        if (form.values.rating) return true;
+        return false;
+      }
+      case 2: {
+        if (form.values.comment) return true;
         return false;
       }
     }
   };
 
-  const nextStep = () =>
-    setActive((current) => (current < 3 ? current + 1 : current));
+  const nextStep = () => {
+    if (formStepperValidation(active)) {
+      setFormError(false);
+      setActive((current) => (current < 3 ? current + 1 : current));
+    } else {
+      setFormError(true);
+    }
+  };
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
@@ -101,7 +117,10 @@ const ViewFeedback = () => {
   };
 
   const validateSecurity = () => {
-    setOpened(true);
+    if (formStepperValidation(active)) setOpened(true);
+    else {
+      setFormError(true);
+    }
   };
 
   useEffect(() => {
@@ -170,6 +189,11 @@ const ViewFeedback = () => {
                     data={courses}
                     rightSection={isLoading ? <Loader size="xs" /> : false}
                     required
+                    error={
+                      formError && !form.values.courseId
+                        ? "Campo requerido."
+                        : false
+                    }
                   />
                 </Grid.Col>
                 <Grid.Col span={6}>
@@ -182,6 +206,11 @@ const ViewFeedback = () => {
                       required
                       onChange={handleTeacherChange}
                       value={form.values.teacherId}
+                      error={
+                        formError && !form.values.teacherId
+                          ? "Campo requerido."
+                          : false
+                      }
                     />
                   ) : (
                     <Select
@@ -228,6 +257,16 @@ const ViewFeedback = () => {
                   />
                 </Center>
               </Box>
+              {formError && !form.values.rating && (
+                <Alert
+                  icon={<FiAlertCircle size={16} />}
+                  title="¡Campo requerido!"
+                  color="yellow"
+                  style={{ marginTop: 10 }}
+                >
+                  Es necesaria una calficación para continuar.
+                </Alert>
+              )}
             </Stepper.Step>
             <Stepper.Step
               label="Comentario"
@@ -280,6 +319,16 @@ const ViewFeedback = () => {
                 required
                 {...form.getInputProps("comment")}
               />
+              {formError && !form.values.comment && (
+                <Alert
+                  icon={<FiAlertCircle size={16} />}
+                  title="¡Campo requerido!"
+                  color="yellow"
+                  style={{ marginTop: 10 }}
+                >
+                  Es necesaria un comentario para continuar.
+                </Alert>
+              )}
               <Textarea
                 style={{ marginTop: 10 }}
                 label="Sugerencia"
