@@ -125,12 +125,6 @@ const ViewFeedback = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get(`/api/user`).then(async (res) => {
-      const user = res.data;
-      if (user.userSecurityValidation === null) {
-        router.replace("/security-settings");
-      }
-    });
     axios.get(`/api/sections`).then((res) => {
       setIsLoading(false);
       setCourses(res.data.courses);

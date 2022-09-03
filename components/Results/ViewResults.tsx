@@ -1,13 +1,24 @@
 import { Box, Table } from "@mantine/core";
 import axios from "axios";
-import { useEffect } from "react";
+import { NextPageContext } from "next";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 const ViewResults = () => {
   // const rows =
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    axios.get();
-  });
+    // setIsLoading(true);
+    // axios.get(`/api/user`).then(async (res) => {
+    //   const user = res.data;
+    //   if (user.userSecurityValidation === null) {
+    //     router.replace("/security-settings");
+    //   }
+    // });
+    // axios.get();
+  }, []);
 
   return (
     <Box sx={{ maxWidth: 900 }} mx="auto">

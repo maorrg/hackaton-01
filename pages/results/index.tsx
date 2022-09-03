@@ -4,10 +4,13 @@ import { NextPageWithAuth } from "../../types/nextPageAuth";
 import { Role } from "../../types/role";
 import ViewResults from "../../components/Results/ViewResults";
 import { LoadingOverlay } from "@mantine/core";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { GetCurrentRoute } from "../../components/Layout/AppShell/_mainLinks";
 import { Unauthorized } from "../../components/Unauthorized";
+import axios from "axios";
+import { NextPageContext } from "next";
+import { getUser } from "../../prisma/utils";
 
 const Results: NextPageWithAuth = () => {
   const { data: session, status } = useSession();
@@ -28,3 +31,22 @@ Results.auth = {
 };
 
 export default Results;
+
+export async function getServerSideProps(context: NextPageContext) {
+  const session = await getSession(context);
+  if (session) {
+    const user = await getUser(session);
+    if (user?.userSecurityValidation === null) {
+      return {
+        redirect: {
+          destination: "/security-settings",
+          permanent: false,
+        },
+      };
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  };
+}
