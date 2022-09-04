@@ -1,14 +1,43 @@
-import { Box, Table } from "@mantine/core";
-import axios from "axios";
-import { NextPageContext } from "next";
+import { Badge, Box, Button, LoadingOverlay, Table } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { defaultFetcher } from "../../utils/fetcher";
+import useSWR from "swr";
 
 const ViewResults = () => {
-  // const rows =
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, error, mutate } = useSWR("/api/results", defaultFetcher);
   const router = useRouter();
 
+  if (error) return <div>failed to load</div>;
+  if (!data) return <LoadingOverlay visible={true} />;
+
+  const rows = data?.map(
+    (element: { courseId: number; name: string; ratingavg: number }) => (
+      <tr key={element.courseId}>
+        <td>{element.name}</td>
+        <td>
+          <Badge
+            size="md"
+            style={{ width: 50 }}
+            color={element.ratingavg < 4 ? "red" : "green"}
+          >
+            {element.ratingavg.toFixed(1)}
+          </Badge>
+        </td>
+        <td>
+          <Button
+            variant="light"
+            radius="xl"
+            size="xs"
+            onClick={() =>
+              alert("Sorete, aca se manda a la página con el detalle.")
+            }
+          >
+            Ver
+          </Button>
+        </td>
+      </tr>
+    )
+  );
   return (
     <Box sx={{ maxWidth: 900 }} mx="auto">
       <h1>Resultados</h1>
@@ -17,9 +46,10 @@ const ViewResults = () => {
           <tr>
             <th>Nombre del curso</th>
             <th>Calificación</th>
+            <th>Acciones</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>{rows}</tbody>
       </Table>
     </Box>
   );

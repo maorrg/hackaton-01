@@ -9,22 +9,25 @@ const securityValidation = async (
   answer: string
 ): Promise<boolean> => {
   var bcrypt = require("bcryptjs");
-  const userSecurityValidation = await prisma.userSecurityValidation.findUnique(
-    {
-      where: {
-        userEmail: userEmail,
-      },
-      select: {
-        securityQuestionId: true,
-        answer: true,
-      },
-    }
-  );
-  if (
-    userSecurityValidation?.securityQuestionId === securityQuestionId &&
-    bcrypt.compareSync(answer, userSecurityValidation.answer)
-  )
-    return true;
+  try {
+    const userSecurityValidation =
+      await prisma.userSecurityValidation.findUnique({
+        where: {
+          userEmail: userEmail,
+        },
+        select: {
+          securityQuestionId: true,
+          answer: true,
+        },
+      });
+    if (
+      userSecurityValidation?.securityQuestionId === securityQuestionId &&
+      bcrypt.compareSync(answer, userSecurityValidation.answer)
+    )
+      return true;
+  } catch (err) {
+    return false;
+  }
   return false;
 };
 

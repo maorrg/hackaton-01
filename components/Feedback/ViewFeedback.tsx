@@ -8,6 +8,7 @@ import {
   Input,
   Loader,
   Modal,
+  PasswordInput,
   Select,
   Stepper,
   Textarea,
@@ -126,15 +127,14 @@ const ViewFeedback = () => {
   useEffect(() => {
     setIsLoading(true);
     axios.get(`/api/sections`).then((res) => {
-      setIsLoading(false);
       setCourses(res.data.courses);
       setTeachers(res.data.teachers);
       setIsLoading(false);
     });
     setIsLoading(true);
     axios.get(`/api/security-settings/questions`).then(async (res) => {
-      setIsLoading(false);
       setQuestions(res.data);
+      setIsLoading(false);
     });
   }, []);
 
@@ -159,11 +159,7 @@ const ViewFeedback = () => {
       <Title mb="sm" mt="lg">
         Registrar feedback
       </Title>
-      <form
-      // onSubmit={form.onSubmit((values) => {
-      //   createFeedback(values);
-      // })}
-      >
+      <form>
         <>
           <Stepper active={active} onStepClick={setActive} breakpoint="sm">
             <Stepper.Step
@@ -183,6 +179,7 @@ const ViewFeedback = () => {
                     data={courses}
                     rightSection={isLoading ? <Loader size="xs" /> : false}
                     required
+                    searchable
                     error={
                       formError && !form.values.courseId
                         ? "Campo requerido."
@@ -198,6 +195,7 @@ const ViewFeedback = () => {
                       placeholder="Seleccione el profesor"
                       data={teachersForSelectedCourse}
                       required
+                      searchable
                       onChange={handleTeacherChange}
                       value={form.values.teacherId}
                       error={
@@ -282,19 +280,15 @@ const ViewFeedback = () => {
                   required
                   {...form.getInputProps("securityQuestionId")}
                 />
-                <Input.Wrapper
+                <PasswordInput
+                  style={{marginTop: 10}}
                   label="Respuesta"
                   description="Ingrese la respuesta a la pregunta."
+                  icon={<MdQuestionAnswer />}
+                  placeholder="Su respuesta"
                   required
-                  style={{ marginTop: 10 }}
-                >
-                  <Input
-                    icon={<MdQuestionAnswer />}
-                    placeholder="Su respuesta"
-                    required
-                    {...form.getInputProps("answer")}
-                  />
-                </Input.Wrapper>
+                  {...form.getInputProps("answer")}
+                />
                 <Group position="center" mt="xl">
                   <Button
                     style={{ marginTop: 5, width: 1000 }}

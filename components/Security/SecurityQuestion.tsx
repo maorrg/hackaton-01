@@ -10,6 +10,7 @@ import {
   LoadingOverlay,
   Container,
   Alert,
+  PasswordInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import axios from "axios";
@@ -83,19 +84,15 @@ const SecurityQuestions = () => {
               required
               {...form.getInputProps("securityQuestionId")}
             />
-            <Input.Wrapper
+            <PasswordInput
               label="Respuesta"
               style={{ marginTop: 20 }}
               description="Ingrese la respuesta a la pregunta."
+              icon={<MdQuestionAnswer />}
+              placeholder="Su respuesta"
               required
-            >
-              <Input
-                icon={<MdQuestionAnswer />}
-                placeholder="Su respuesta"
-                required
-                {...form.getInputProps("answer")}
-              />
-            </Input.Wrapper>
+              {...form.getInputProps("answer")}
+            />
             <Group position="center" mt="xl">
               <Button variant="light" type="submit">
                 Guardar
@@ -110,8 +107,8 @@ const SecurityQuestions = () => {
             title="¡Pregunta de seguridad establecida!"
             color="yellow"
           >
-            Si tienes problemas con tu cuenta y deseas reestablecer la pregunta de
-            seguridad, por favor comunícate con soporte.
+            Si tienes problemas con tu cuenta y deseas reestablecer la pregunta
+            de seguridad, por favor comunícate con soporte.
           </Alert>
         </Container>
       )}
