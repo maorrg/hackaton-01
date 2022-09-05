@@ -1,8 +1,4 @@
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import BackOfficeShell from "../../components/Layout/AppShell/BackOfficeShell";
-import { GetCurrentRoute } from "../../components/Layout/AppShell/_mainLinks";
-import { Unauthorized } from "../../components/Unauthorized";
 import { Role } from "../../types/role";
 import {
   Box,
@@ -13,6 +9,7 @@ import {
   Badge,
   Button,
   Group,
+  Paper,
 } from "@mantine/core";
 import { NextPageContext } from "next";
 import { getCourseFeedbackById, getCourseNameById } from "../../prisma/utils";
@@ -34,7 +31,6 @@ const CourseResults = (props: Props) => {
           {feedback.rating}
         </Badge>
       </Group>
-
       <Text size="sm" color="dimmed">
         {feedback.comment}
       </Text>
@@ -52,21 +48,29 @@ const CourseResults = (props: Props) => {
           {props.courseFeedbackList.map((feedback, index) => (
             <Card shadow="sm" p="lg" radius="md" withBorder key={index}>
               <Group position="apart" mt="md" mb="xs">
-                <h3>Profesor: {feedback.teacherName}</h3>
+                <Text size="md">{feedback.teacherName}</Text>
                 <Badge color={feedback.rating < 4 ? "red" : "green"} size="xl">
                   {feedback.rating}
                 </Badge>
               </Group>
-              <h4>Comentario:</h4>
-              <Text size="sm" color="dimmed">
-                {feedback.comment}
-              </Text>
+              <Paper shadow="xs" p="md" withBorder>
+                <Group>
+                  <Badge>Comentario</Badge>
+                  <Text size="sm" color="dimmed">
+                    {feedback.comment}
+                  </Text>
+                </Group>
+              </Paper>
               {feedback.suggestion && (
                 <>
-                  <h4>Sugerencia:</h4>
-                  <Text size="sm" color="dimmed">
-                    {feedback.suggestion}
-                  </Text>
+                  <Paper shadow="xs" p="md" withBorder style={{ marginTop: 5 }}>
+                    <Group>
+                      <Badge color="yellow">Sugerencia</Badge>
+                      <Text size="sm" color="dimmed">
+                        {feedback.suggestion}
+                      </Text>
+                    </Group>
+                  </Paper>
                 </>
               )}
             </Card>
