@@ -4,18 +4,21 @@ import {
   Box,
   LoadingOverlay,
   Card,
-  Image,
   Text,
   Badge,
-  Button,
   Group,
   Paper,
   Title,
 } from "@mantine/core";
 import { NextPageContext } from "next";
-import { getCourseFeedbackById, getCourseNameById } from "../../prisma/utils";
+import {
+  getCourseFeedbackById,
+  getCourseFeedbackByIdForTeacherId,
+  getCourseNameById,
+} from "../../prisma/utils";
 import { ICourseFeedback } from "../../utils/types";
 import { MdClass } from "react-icons/md";
+import { getSession } from "next-auth/react";
 
 interface Props {
   courseName: string;
@@ -45,15 +48,22 @@ const CourseResults = (props: Props) => {
   return (
     <BackOfficeShell>
       <Box sx={{ maxWidth: 900 }} mx="auto">
-        <Group style={{padding: 15}}>
+        <Group style={{ padding: 15 }}>
           <MdClass size={30} />
           <Title>{props.courseName}</Title>
         </Group>
         <>
           {props.courseFeedbackList.map((feedback, index) => (
-            <Card shadow="sm" p="lg" radius="md" withBorder key={index} style={{marginTop: 10}}>
+            <Card
+              shadow="sm"
+              p="lg"
+              radius="md"
+              withBorder
+              key={index}
+              style={{ marginTop: 10 }}
+            >
               <Group position="apart" mt="md" mb="xs">
-                <Text size="md">{feedback.teacherName}</Text>
+                <Title order={3}>{feedback.teacherName}</Title>
                 <Badge color={feedback.rating < 4 ? "red" : "green"} size="xl">
                   {feedback.rating}
                 </Badge>
@@ -96,12 +106,27 @@ export default CourseResults;
 
 export async function getServerSideProps(context: NextPageContext) {
   const courseId = context.query.course_id;
+  const session = await getSession(context);
   if (typeof courseId === "string") {
     const course = await getCourseNameById(parseInt(courseId));
-    const courseFeedbackList = await getCourseFeedbackById(parseInt(courseId));
-    return {
-      props: { courseName: course, courseFeedbackList: courseFeedbackList },
-    };
+    if (session?.user.role === "TEACHER") {
+      const courseFeedbackList = await getCourseFeedbackByIdForTeacherId(
+        parseInt(courseId),
+        session!
+      );
+      return {
+        props: { courseName: course, courseFeedbackList: courseFeedbackList },
+      };
+    }
+    if (session?.user.role === "ADMIN") {
+      const courseFeedbackList = await getCourseFeedbackById(
+        parseInt(courseId),
+        session!
+      );
+      return {
+        props: { courseName: course, courseFeedbackList: courseFeedbackList },
+      };
+    }
   } else {
     return {
       redirect: {
