@@ -9,6 +9,8 @@ import {
   Group,
   Paper,
   Title,
+  Anchor,
+  Breadcrumbs,
 } from "@mantine/core";
 import { NextPageContext } from "next";
 import {
@@ -26,8 +28,6 @@ interface Props {
 }
 
 const CourseResults = (props: Props) => {
-  console.log(props.courseFeedbackList);
-
   const feedbackComponents = props.courseFeedbackList.forEach((feedback) => (
     <Card shadow="sm" p="lg" radius="md" withBorder>
       <Group position="apart" mt="md" mb="xs">
@@ -45,9 +45,21 @@ const CourseResults = (props: Props) => {
     </Card>
   ));
 
+  const items = [
+    { title: "Resultados", href: "/results" },
+    { title: props.courseName, href: "#" },
+  ].map((item, index) => (
+    <Anchor href={item.href} key={index}>
+      {item.title}
+    </Anchor>
+  ));
+
   return (
     <BackOfficeShell>
       <Box sx={{ maxWidth: 900 }} mx="auto">
+        <Breadcrumbs style={{ marginTop: 10 }} separator="→">
+          {items}
+        </Breadcrumbs>
         <Group style={{ padding: 15 }}>
           <MdClass size={30} />
           <Title>{props.courseName}</Title>
