@@ -10,10 +10,12 @@ import {
   Button,
   Group,
   Paper,
+  Title,
 } from "@mantine/core";
 import { NextPageContext } from "next";
 import { getCourseFeedbackById, getCourseNameById } from "../../prisma/utils";
 import { ICourseFeedback } from "../../utils/types";
+import { MdClass } from "react-icons/md";
 
 interface Props {
   courseName: string;
@@ -43,10 +45,13 @@ const CourseResults = (props: Props) => {
   return (
     <BackOfficeShell>
       <Box sx={{ maxWidth: 900 }} mx="auto">
-        <h1>Curso: {props.courseName}</h1>
+        <Group style={{padding: 15}}>
+          <MdClass size={30} />
+          <Title>{props.courseName}</Title>
+        </Group>
         <>
           {props.courseFeedbackList.map((feedback, index) => (
-            <Card shadow="sm" p="lg" radius="md" withBorder key={index}>
+            <Card shadow="sm" p="lg" radius="md" withBorder key={index} style={{marginTop: 10}}>
               <Group position="apart" mt="md" mb="xs">
                 <Text size="md">{feedback.teacherName}</Text>
                 <Badge color={feedback.rating < 4 ? "red" : "green"} size="xl">
