@@ -28,9 +28,10 @@ const ViewResults = () => {
             variant="light"
             radius="xl"
             size="xs"
-            onClick={() =>
-              alert("Sorete, aca se manda a la página con el detalle.")
-            }
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.preventDefault();
+              router.push(`/results/${element.courseId}`);
+            }}
           >
             Ver
           </Button>

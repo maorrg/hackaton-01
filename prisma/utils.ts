@@ -16,3 +16,32 @@ export const getUser = async (session: Session) => {
   });
   return user;
 };
+
+export const getCourseNameById = async (courseId: number) => {
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: {
+      name: true,
+    },
+  });
+  return course?.name;
+};
+
+export const getCourseFeedbackById = async (courseId: number) => {
+  /* 
+  {
+    professorName,
+    rating,
+    comment,
+    suggestion,
+  }
+
+  for (section in sections) {
+    for (tasof in section.teacherAndSectionOnFeedback) {
+      for (feedback in tasof.feedback) {
+        // extraer rating, comment y suggestion
+      }
+    }
+  }
+  */
+};
