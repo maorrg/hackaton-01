@@ -13,6 +13,36 @@ export default NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      if (account.provider === "google") {
+        const userDB = await prisma.user.findUnique({
+          where: {
+            email: user.email!,
+          },
+          select: {
+            id: true,
+            accounts: true,
+          },
+        });
+        if (userDB?.accounts.length === 1) return true;
+        if (userDB) {
+          await prisma.account.create({
+            data: {
+              userId: userDB.id,
+              type: account.type,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          });
+          await prisma.user.update({
+            where: { email: user.email! },
+            data: { image: user.image, name: user.name },
+          });
+          return true;
+        }
+      }
+      return false;
+    },
     async jwt({ token, user }) {
       if (user) token.role = user.role;
       return token;
