@@ -51,6 +51,7 @@ model User {
   feedbacks              Feedback[]
   sections               Section[]
   userSecurityValidation UserSecurityValidation?
+  teacher                Teacher?
 }
 
 model VerificationToken {
@@ -67,6 +68,8 @@ model Teacher {
   lastname                    String
   sections                    Section[]
   TeacherAndSectionOnFeedback TeacherAndSectionOnFeedback[]
+  user                        User?                         @relation(fields: [userId], references: [id])
+  userId                      String?                       @unique
 }
 
 model Course {

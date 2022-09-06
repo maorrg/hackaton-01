@@ -1,22 +1,26 @@
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import BackOfficeShell from "../../components/Layout/AppShell/BackOfficeShell";
-import { GetCurrentRoute } from "../../components/Layout/AppShell/_mainLinks";
-import { Unauthorized } from "../../components/Unauthorized";
 import { Role } from "../../types/role";
 import {
   Box,
   LoadingOverlay,
   Card,
-  Image,
   Text,
   Badge,
-  Button,
   Group,
+  Paper,
+  Title,
+  Anchor,
+  Breadcrumbs,
 } from "@mantine/core";
 import { NextPageContext } from "next";
-import { getCourseFeedbackById, getCourseNameById } from "../../prisma/utils";
+import {
+  getCourseFeedbackById,
+  getCourseFeedbackByIdForTeacherId,
+  getCourseNameById,
+} from "../../prisma/utils";
 import { ICourseFeedback } from "../../utils/types";
+import { MdClass } from "react-icons/md";
+import { getSession } from "next-auth/react";
 
 interface Props {
   courseName: string;
@@ -24,8 +28,6 @@ interface Props {
 }
 
 const CourseResults = (props: Props) => {
-  console.log(props.courseFeedbackList);
-
   const feedbackComponents = props.courseFeedbackList.forEach((feedback) => (
     <Card shadow="sm" p="lg" radius="md" withBorder>
       <Group position="apart" mt="md" mb="xs">
@@ -34,7 +36,6 @@ const CourseResults = (props: Props) => {
           {feedback.rating}
         </Badge>
       </Group>
-
       <Text size="sm" color="dimmed">
         {feedback.comment}
       </Text>
@@ -44,29 +45,59 @@ const CourseResults = (props: Props) => {
     </Card>
   ));
 
+  const items = [
+    { title: "Resultados", href: "/results" },
+    { title: props.courseName, href: "#" },
+  ].map((item, index) => (
+    <Anchor href={item.href} key={index}>
+      {item.title}
+    </Anchor>
+  ));
+
   return (
     <BackOfficeShell>
       <Box sx={{ maxWidth: 900 }} mx="auto">
-        <h1>Curso: {props.courseName}</h1>
+        <Breadcrumbs style={{ marginTop: 10 }} separator="→">
+          {items}
+        </Breadcrumbs>
+        <Group style={{ padding: 15 }}>
+          <MdClass size={30} />
+          <Title>{props.courseName}</Title>
+        </Group>
         <>
           {props.courseFeedbackList.map((feedback, index) => (
-            <Card shadow="sm" p="lg" radius="md" withBorder key={index}>
+            <Card
+              shadow="sm"
+              p="lg"
+              radius="md"
+              withBorder
+              key={index}
+              style={{ marginTop: 10 }}
+            >
               <Group position="apart" mt="md" mb="xs">
-                <h3>Profesor: {feedback.teacherName}</h3>
+                <Title order={3}>{feedback.teacherName}</Title>
                 <Badge color={feedback.rating < 4 ? "red" : "green"} size="xl">
                   {feedback.rating}
                 </Badge>
               </Group>
-              <h4>Comentario:</h4>
-              <Text size="sm" color="dimmed">
-                {feedback.comment}
-              </Text>
+              <Paper shadow="xs" p="md" withBorder>
+                <Group>
+                  <Badge>Comentario</Badge>
+                  <Text size="sm" color="dimmed">
+                    {feedback.comment}
+                  </Text>
+                </Group>
+              </Paper>
               {feedback.suggestion && (
                 <>
-                  <h4>Sugerencia:</h4>
-                  <Text size="sm" color="dimmed">
-                    {feedback.suggestion}
-                  </Text>
+                  <Paper shadow="xs" p="md" withBorder style={{ marginTop: 5 }}>
+                    <Group>
+                      <Badge color="yellow">Sugerencia</Badge>
+                      <Text size="sm" color="dimmed">
+                        {feedback.suggestion}
+                      </Text>
+                    </Group>
+                  </Paper>
                 </>
               )}
             </Card>
@@ -87,12 +118,27 @@ export default CourseResults;
 
 export async function getServerSideProps(context: NextPageContext) {
   const courseId = context.query.course_id;
+  const session = await getSession(context);
   if (typeof courseId === "string") {
     const course = await getCourseNameById(parseInt(courseId));
-    const courseFeedbackList = await getCourseFeedbackById(parseInt(courseId));
-    return {
-      props: { courseName: course, courseFeedbackList: courseFeedbackList },
-    };
+    if (session?.user.role === "TEACHER") {
+      const courseFeedbackList = await getCourseFeedbackByIdForTeacherId(
+        parseInt(courseId),
+        session!
+      );
+      return {
+        props: { courseName: course, courseFeedbackList: courseFeedbackList },
+      };
+    }
+    if (session?.user.role === "ADMIN") {
+      const courseFeedbackList = await getCourseFeedbackById(
+        parseInt(courseId),
+        session!
+      );
+      return {
+        props: { courseName: course, courseFeedbackList: courseFeedbackList },
+      };
+    }
   } else {
     return {
       redirect: {

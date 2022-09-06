@@ -15,12 +15,21 @@ export default async function handle(
   if (session) {
     switch (req.method) {
       case "GET":
-        if (
-          session.user.role === Role.ADMIN ||
-          session.user.role === Role.TEACHER
-        ) {
+        if (session.user.role === Role.ADMIN) {
           const results =
             await prisma.$queryRaw`SELECT s."courseId", c."name", AVG(f."rating") as ratingAVG FROM "TeacherAndSectionOnFeedback" AS t JOIN "Feedback" as f ON t."feedbackId" = f."id" JOIN "Section" AS s ON s."id" = t."sectionId" JOIN "Course" as c ON c."id" = s."courseId" GROUP BY s."courseId", c."name";`;
+          return res.status(200).json(results);
+        }
+        if (session.user.role === Role.TEACHER) {
+          const user = await prisma.user.findUnique({
+            where: { email: session.user.email! },
+            select: {
+              id: true, 
+              teacher: true,
+            },
+          });
+          const results =
+            await prisma.$queryRaw`SELECT s."courseId", c."name", AVG(f."rating") as ratingAVG FROM (SELECT * FROM "TeacherAndSectionOnFeedback" as tsf WHERE tsf."teacherId"=${user?.teacher?.id})  AS t JOIN "Feedback" as f ON t."feedbackId" = f."id" JOIN "Section" AS s ON s."id" = t."sectionId" JOIN "Course" as c ON c."id" = s."courseId" GROUP BY s."courseId", c."name";`;
           return res.status(200).json(results);
         }
         return res.status(401).send({ message: "Unauthorized Method" });
