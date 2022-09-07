@@ -14,6 +14,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FiAlertCircle } from "react-icons/fi";
@@ -31,6 +32,7 @@ const SecurityQuestions = () => {
   const [questions, setQuestions] = useState([]);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const session = useSession();
 
   const form = useForm({
     initialValues: buildFormInitialValues(),
@@ -40,7 +42,10 @@ const SecurityQuestions = () => {
     axios
       .post(`/api/security-settings`, { formValues: values })
       .then((res) => {
-        router.replace("/");
+        if (session.data?.user.role == "STUDENT") router.replace("/feedback");
+        else if (session.data?.user.role == "TEACHER")
+          router.replace("/results");
+        else router.replace("/");
       })
       .catch((err) => {
         console.log(err);
