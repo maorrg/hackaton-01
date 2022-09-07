@@ -22,6 +22,7 @@ import { ICourseFeedback } from "../../utils/types";
 import { MdClass } from "react-icons/md";
 import { getSession } from "next-auth/react";
 import { AiFillStar } from "react-icons/ai";
+import { getRatingColor } from "../../utils/styles";
 
 interface Props {
   courseName: string;
@@ -81,7 +82,7 @@ const CourseResults = (props: Props) => {
                 <Badge
                   style={{ width: 80 }}
                   leftSection={<AiFillStar size={12} />}
-                  color={feedback.rating < 4 ? "red" : "green"}
+                  color={getRatingColor(feedback.rating)}
                   size="xl"
                 >
                   {feedback.rating}

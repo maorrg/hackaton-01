@@ -2,6 +2,7 @@ import { Badge, Box, Button, LoadingOverlay, Table } from "@mantine/core";
 import { useRouter } from "next/router";
 import { defaultFetcher } from "../../utils/fetcher";
 import useSWR from "swr";
+import { getRatingColor } from "../../utils/styles";
 
 const ViewResults = () => {
   const { data, error, mutate } = useSWR("/api/results", defaultFetcher);
@@ -18,7 +19,7 @@ const ViewResults = () => {
           <Badge
             size="md"
             style={{ width: 50 }}
-            color={element.ratingavg < 4 ? "red" : "green"}
+            color={getRatingColor(element.ratingavg)}
           >
             {element.ratingavg.toFixed(1)}
           </Badge>
