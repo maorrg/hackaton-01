@@ -5,7 +5,6 @@ import {
   Center,
   Grid,
   Group,
-  Input,
   Loader,
   Modal,
   PasswordInput,
@@ -13,12 +12,14 @@ import {
   Stepper,
   Textarea,
   Title,
+  Text,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FiCheck } from "react-icons/fi";
 import {
+  AiFillClockCircle,
   AiOutlineComment,
   AiOutlineUnorderedList,
   AiTwotoneStar,
@@ -48,6 +49,13 @@ const ViewFeedback = () => {
   const [active, setActive] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [timeError, setTimeError] = useState(false);
+  const [timeErrorData, setTimeErrorData] = useState({
+    message: "",
+    timeElapsed: "",
+    lastFeedbackDate: "",
+    currentFeedbackDate: "",
+  });
   const [courses, setCourses] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [formError, setFormError] = useState(false);
@@ -103,17 +111,24 @@ const ViewFeedback = () => {
         nextStep();
       })
       .catch((err) => {
-        form.setFieldValue("securityQuestionId", "");
-        form.setFieldValue("answer", "");
-        setOpened(false);
-        showNotification({
-          title: "¡Error de autentificación!",
-          message:
-            "Las credenciales ingresadas son incorrectas, intente nuevamente.",
-          autoClose: 5000,
-          color: "red",
-          icon: <IoIosRemoveCircle size={20} />,
-        });
+        if (err.response.status === 429) {
+          setTimeError(true);
+          setTimeErrorData(err.response.data);
+          nextStep();
+          return;
+        } else {
+          form.setFieldValue("securityQuestionId", "");
+          form.setFieldValue("answer", "");
+          setOpened(false);
+          showNotification({
+            title: "¡Error de autentificación!",
+            message:
+              "Las credenciales ingresadas son incorrectas, intente nuevamente.",
+            autoClose: 5000,
+            color: "red",
+            icon: <IoIosRemoveCircle size={20} />,
+          });
+        }
       });
   };
 
@@ -281,7 +296,7 @@ const ViewFeedback = () => {
                   {...form.getInputProps("securityQuestionId")}
                 />
                 <PasswordInput
-                  style={{marginTop: 10}}
+                  style={{ marginTop: 10 }}
                   label="Respuesta"
                   description="Ingrese la respuesta a la pregunta."
                   icon={<MdQuestionAnswer />}
@@ -326,12 +341,22 @@ const ViewFeedback = () => {
               />
             </Stepper.Step>
             <Stepper.Completed>
-              <Alert
-                icon={<BsFillCheckCircleFill size={16} />}
-                title="¡Gracias por el feedback!"
-              >
-                Constantemente buscamos ser mejores, gracias por formar parte.
-              </Alert>
+              {timeError ? (
+                <Alert
+                  color="yellow"
+                  icon={<AiFillClockCircle size={16} />}
+                  title="¡Feedback recientemente dado!"
+                >
+                  {timeErrorData.message}
+                </Alert>
+              ) : (
+                <Alert
+                  icon={<BsFillCheckCircleFill size={16} />}
+                  title="¡Gracias por el feedback!"
+                >
+                  Constantemente buscamos ser mejores, gracias por formar parte.
+                </Alert>
+              )}
             </Stepper.Completed>
           </Stepper>
 
@@ -355,8 +380,8 @@ const ViewFeedback = () => {
             </Group>
           ) : (
             <Group position="right" mt="xl">
-              <Button onClick={() => router.reload()}>
-                Completar otro formulario
+              <Button onClick={() => router.reload()} color={timeError ? "yellow" : ""}>
+                {timeError ? "Intentar con otro curso / profesor" : "Completar otro formulario"}
               </Button>
             </Group>
           )}

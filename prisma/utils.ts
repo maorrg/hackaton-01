@@ -57,6 +57,7 @@ export const getCourseFeedbackById = async (
                   rating: true,
                   comment: true,
                   suggestion: true,
+                  createdAt: true,
                 },
               },
             },
@@ -73,6 +74,7 @@ export const getCourseFeedbackById = async (
         rating: tasof.feedback.rating,
         comment: tasof.feedback.comment,
         suggestion: tasof.feedback.suggestion,
+        createdAt: tasof.feedback.createdAt.toLocaleDateString(),
       });
     });
   });
@@ -111,6 +113,7 @@ export const getCourseFeedbackByIdForTeacherId = async (
                   rating: true,
                   comment: true,
                   suggestion: true,
+                  createdAt: true,
                 },
               },
             },
@@ -127,6 +130,7 @@ export const getCourseFeedbackByIdForTeacherId = async (
         rating: tasof.feedback.rating,
         comment: tasof.feedback.comment,
         suggestion: tasof.feedback.suggestion,
+        createdAt: tasof.feedback.createdAt.toDateString(),
       });
     });
   });

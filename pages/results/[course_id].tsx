@@ -21,6 +21,7 @@ import {
 import { ICourseFeedback } from "../../utils/types";
 import { MdClass } from "react-icons/md";
 import { getSession } from "next-auth/react";
+import { AiFillStar } from "react-icons/ai";
 
 interface Props {
   courseName: string;
@@ -74,9 +75,15 @@ const CourseResults = (props: Props) => {
               key={index}
               style={{ marginTop: 10 }}
             >
+              <Badge size="lg">{feedback.createdAt}</Badge>
               <Group position="apart" mt="md" mb="xs">
                 <Title order={3}>{feedback.teacherName}</Title>
-                <Badge color={feedback.rating < 4 ? "red" : "green"} size="xl">
+                <Badge
+                  style={{ width: 80 }}
+                  leftSection={<AiFillStar size={12} />}
+                  color={feedback.rating < 4 ? "red" : "green"}
+                  size="xl"
+                >
                   {feedback.rating}
                 </Badge>
               </Group>
