@@ -82,7 +82,7 @@ const SecurityQuestions = () => {
           >
             <Select
               label="Seleccione su pregunta de seguridad"
-              description="Se le realizará esta pregunta cada vez que desea dar feedbakc sobre un curso."
+              description="Se le realizará esta pregunta cada vez que desea dar feedback sobre un curso."
               placeholder="Seleccione una pregunta"
               data={questions}
               rightSection={isLoading ? <Loader size="xs" /> : false}
